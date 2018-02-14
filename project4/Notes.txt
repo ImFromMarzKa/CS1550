@@ -1,0 +1,96 @@
+//Riley Marzka
+//CS1550
+//Project 4 (File Systems)
+//Directories Due: 4/17/17 (Mon)
+//Complete Due: 4/23/17 (Sun)
+
+* Use the FUSE Linux kernel extension to create our own file system
+	* Managed via 1 file that represents disk space
+	* Through this implementation and through FUSE, we will interact with our newly created file system using standard Linux programs in a transparent way
+
+* Your Job:
+	* Create the cs1550 file system as a FUSE application
+		* Provides the user inferface in project description
+	* cs1550 file system is implemented using a single file
+		* Managed by real file system in the directory that contains cs1550
+		* File should keep track of:
+			* Directories
+			* File data
+	* Consider disk to have 512 byte blocks
+		* Disk contains blocks that are directories and blocks that are file data
+			* Must be able to identify
+		* Root only contains other directories
+			* Use block 0 of .disk to hold directory entry of root
+			*From there, find subdirectories
+			* There is a max number of subdirectories
+
+
+	* Subdirectories:
+		* Stored in .disk file as single (block sized) cs1550_directory_entry struct
+			* One per subdirectory
+		* There is a max number of files per directory
+		* Each file in directory has filename in 8.3
+			* name.extension
+		* Need to record size and location of file's first block on .disk
+
+	* File Allocation Table (FAT):
+		* Files stored alongside directories in .disk
+		* FAT holds link information between directories and files 
+			* File B stored in blocks 10 & 12
+				* FAT[10] = 12
+				* FAT[12] = EOF
+		* EOF is sentinal value of my choice
+		* Also need a sentinal value to indicate free blocks
+
+	* Syscalls:
+		* 
+
+	* Build & Test:
+		* To build changes:
+			* make
+		* Launch FUSE with -d option
+			* ./cs1550 -d testmount
+			* Keeps program in foreground
+			* Prints out every message application receives
+			* Interperets return values
+		* Remember to unmount on program crash
+		* Subdirectories involve testing with:
+			* ls
+			* mkdir
+		* For files:
+			* echo (and redirection) - Write to file
+			* cat - Read from file
+			* pico (eventually)
+		* Delete .disk if it become corrupted
+		* To see contents in hex of a file:
+			* od -x
+		* To grab human readable text:
+			* strings
+
+	* Notes/Hints:
+		* Root directory = mount point
+			* FUSE  does not see directory tree outside of this
+			* Paths translated automatically
+		* sscanf(path, "/%[^/]/%[^.].%s", directory, filename, extension); or you can use strtok()
+		* Free to use any C Standard Libraries 
+		* ALWAYS CLOSE DISK FILE AFTER YOU OPEN IT IN A FUNCTION
+		* Open files for binary access
+		* Will grade with -d option
+			* FUSE won't be able to find .disk file, if it is referenced via a relative path
+
+
+
+
+
+* Versioning:
+	* Installed FUSE
+	* Went through example
+	* Created disk image
+	* Directories portion finished
+	* mknode()
+		* Finished -> Untested
+		** Need better check for root directory 
+	* read()
+		* Finished -> Untested
+	* write()
+		* 
