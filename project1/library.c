@@ -90,37 +90,41 @@ char getkey(){
 	struct timeval tv;
 	int retval;
 
-polling_loop:
-	//Watch stdin (fd 0) to see when it has input
-	FD_ZERO(&rfds);
-	FD_SET(0, &rfds);
+	int cont = 1;
+	while(cont){
 
-	//Set time to wait to zero
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
-	retval = select(1, &rfds, NULL, NULL, &tv);
-	//Error
-	if(retval == -1){
-		perror("select()");
-	}
-	//Key pressed
-	else if(retval){
-		//READ 
-		char ch;
-		retval = read(0, (void *)&ch, 1);
+		//Watch stdin (fd 0) to see when it has input
+		FD_ZERO(&rfds);
+		FD_SET(0, &rfds);
+
+		//Set time to wait to zero
+		tv.tv_sec = 0;
+		tv.tv_usec = 0;
+		retval = select(1, &rfds, NULL, NULL, &tv);
 		//Error
 		if(retval == -1){
-			perror("read()");
-			exit_graphics();
+			perror("select()");
+			cont = 0;
 		}
+		//Key pressed
+		else if(retval){
+			//READ 
+			char ch;
+			retval = read(0, (void *)&ch, 1);
+			//Error
+			if(retval == -1){
+				perror("read()");
+				exit_graphics();
+			}
+			else{
+				return ch;
+			}
+		}
+		//No key Pressed
 		else{
-			return ch;
+			//Try again
+			cont = 1;
 		}
-	}
-	//No key Pressed
-	else{
-		//Try again
-		goto polling_loop;
 	}
 }
 
